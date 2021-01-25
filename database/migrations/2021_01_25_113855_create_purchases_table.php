@@ -15,7 +15,10 @@ class CreatePurchasesTable extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
+            $table->integer('app_id');
+            $table->string('receipt');
             $table->timestamps();
+            $table->dateTime('expire');
         });
     }
 

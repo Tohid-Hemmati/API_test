@@ -2,85 +2,86 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\MobileApp;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class PurchaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function purchase(Request $request, Purchase $purchase)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'receipt' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response(['errors' => $validator->errors()->all()], 422);
+        }
+
+        $token = $request->bearerToken();
+
+        $client = MobileApp::where('app_token', $token)->first();
+        if ($client) {
+            if (strtolower($client->device_OS) == 'android') {
+                if ($this->Google_mocker($request['receipt']) === true) {
+                    $request['app_id'] = $client->id;
+                    $request['expire'] = date('Y-m-d', strtotime('+1 year'));
+                    $purchase = Purchase::create($request->toArray());
+                    return response($purchase, 200);
+                }
+
+            } elseif (strtolower($client->device_OS) == 'ios') {
+                if ($this->ios_mocker($request['receipt']) === true) {
+                    $request['app_id'] = $client->id;
+                    $request['expire'] = date('Y-m-d', strtotime('+1 year'));
+                    $purchase = Purchase::create($request->toArray());
+                    return response($purchase, 200);
+                }
+
+            } else {
+                $response = ["message" => 'OS not supported'];
+                return response($response, 422);
+
+            }
+        } else {
+            $response = ["message" => 'please register application'];
+            return response($response, 422);
+
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function Google_mocker($hash)
     {
-        //
+        $receipt = str_split(strrev($hash));
+        foreach ($receipt as $val) {
+            if (is_numeric($val)) {
+                if ($val % 2 !== 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+        }
+        return false;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function ios_mocker($hash)
     {
-        //
+        $receipt = str_split(strrev($hash));
+        foreach ($receipt as $val) {
+            if (is_numeric($val)) {
+                if ($val % 2 !== 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+        }
+        return false;
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Purchase  $purchase
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Purchase $purchase)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Purchase  $purchase
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Purchase $purchase)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Purchase  $purchase
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Purchase $purchase)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Purchase  $purchase
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Purchase $purchase)
-    {
-        //
-    }
 }
