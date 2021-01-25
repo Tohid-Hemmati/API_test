@@ -15,7 +15,6 @@ class DeviceController extends Controller
     public function registerDevice(Request $request, Device $device)
     {
 
-
         $validator = Validator::make($request->all(), [
             'appID' => 'required',
             'lang' => 'required|string',
@@ -25,25 +24,17 @@ class DeviceController extends Controller
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);
         }
-          $token = $request->bearerToken();
-        $user = User::where('userToken',$token)->first();
+        $token = $request->bearerToken();
+        $user = User::where('userToken', $token)->first();
         if ($user) {
-//            if (($token == $user->userToken)) {
-                    $request['client_token'] = Hash::make(Str::random(10));
-                    $request['uID']=$user->id;
-                    $device = Device::create($request->toArray());
-                    return response($device, 200);
-//
-//            }else
-//            {
-//                    $response=["message"=>'wrong token'];
-//                    return response($response,422);
-//            }
-        }else
-            {
-                $response=["message"=>'User dose not exist'];
-                return response($response,422);
-            }
+            $request['client_token'] = Hash::make(Str::random(10));
+            $request['uID'] = $user->id;
+            $device = Device::create($request->toArray());
+            return response($device, 200);
+        } else {
+            $response = ["message" => 'Wrong token or user didnt exist'];
+            return response($response, 422);
+        }
 
 
     }

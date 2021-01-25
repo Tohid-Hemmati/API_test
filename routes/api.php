@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\DeviceController;
+use App\Http\Controllers\Api\MobileAppController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,3 +23,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('UserRegister',[UserController::class,'register']);
 Route::post('UserLogin',[UserController::class,'login']);
 Route::post('DeviceRegister',[DeviceController::class,'registerDevice']);
+Route::post('AppRegister',[MobileAppController::class,'appRegister']);
