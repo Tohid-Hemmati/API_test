@@ -10,4 +10,11 @@ class MobileApp extends Model
     use HasFactory;
 
     protected $guarded=['id'];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'userToken',
+        'id'
+    ];
 }

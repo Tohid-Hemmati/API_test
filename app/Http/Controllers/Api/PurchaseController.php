@@ -29,6 +29,9 @@ class PurchaseController extends Controller
                     $request['app_id'] = $client->id;
                     $request['expire'] = date('Y-m-d', strtotime('+1 year'));
                     $purchase = Purchase::create($request->toArray());
+
+                    $client->subscription_status = 1 ;
+                    $client->save();
                     return response($purchase, 200);
                 }
 
