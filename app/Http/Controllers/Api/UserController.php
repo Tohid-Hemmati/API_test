@@ -25,7 +25,7 @@ class UserController extends Controller
         }
 
         $request['password'] = Hash::make($request['password']);
-        $request['userToken'] = Str::random(50);
+        $request['userToken'] = Hash::make(Str::random(10));
         $user = User::create($request->toArray());
         return response($user, 200);
     }
@@ -42,7 +42,8 @@ class UserController extends Controller
         }
         $user = User::where('email', $request->email)->first();
         if ($user) {
-            if ((Hash::check($request->password, $user->password)) && ($request->userToken == $user->userToken)) {
+            $token = $request->bearerToken();
+            if ((Hash::check($request->password, $user->password)) && ($token == $user->userToken)) {
                 $response = ["message" => "logged in"];
                 return response([$response], 200);
             } else {
