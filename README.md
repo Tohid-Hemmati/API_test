@@ -5,12 +5,16 @@
 ### Routes:
 
 -   **http://127.0.0.1:8000/api/UserRegister**
-    **http://127.0.0.1:8000/api/UserLogin**
-    **http://127.0.0.1:8000/api/subscribe**
-    **http://127.0.0.1:8000/api/DeviceRegister**
-    **http://127.0.0.1:8000/api/AppRegister**
-    **http://127.0.0.1:8000/api/subscription_check**
--
+-   **http://127.0.0.1:8000/api/UserLogin**
+-   **http://127.0.0.1:8000/api/subscribe**
+-   **http://127.0.0.1:8000/api/DeviceRegister**
+-   **http://127.0.0.1:8000/api/AppRegister**
+-   **http://127.0.0.1:8000/api/subscription_check**
+    <br><br>
+
+## database schemas
+
+stored in root directory under <b>database schemas</b>
 
 ## register user
 
