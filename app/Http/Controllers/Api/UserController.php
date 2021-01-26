@@ -26,6 +26,7 @@ class UserController extends Controller
 
         $request['password'] = Hash::make($request['password']);
         $request['userToken'] = Hash::make(Str::random(10));
+        $request['userToken'] = 'kjnk';
         $user = User::create($request->toArray());
         return response($user, 200);
     }
