@@ -21,7 +21,7 @@ class CreateMobileAppsTable extends Migration
             $table->string('app_token');
             $table->boolean('in_app_purchase');
             $table->boolean('subscription_status')->default(0);
-            $table->timestamps();
+            $table->dateTime('register_time');
         });
     }
 

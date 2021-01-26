@@ -29,6 +29,7 @@ class MobileAppController extends Controller
             $request['app_token'] = Hash::make(Str::random(10));
             $request['device_id'] = $device->id;
             $request['device_OS'] = $device->OS;
+            $request['register_time'] = date('Y-m-d H:i:s');
             $device = MobileApp::create($request->toArray());
             return response($device, 200);
         } else {

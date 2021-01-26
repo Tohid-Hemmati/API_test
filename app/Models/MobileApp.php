@@ -9,7 +9,7 @@ class MobileApp extends Model
 {
     use HasFactory;
 
-    protected $guarded=['id'];
+    protected $guarded = ['id'];
 
     protected $hidden = [
         'password',
@@ -17,4 +17,5 @@ class MobileApp extends Model
         'userToken',
         'id'
     ];
+    public $timestamps = false;
 }

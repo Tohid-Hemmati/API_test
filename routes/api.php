@@ -26,3 +26,4 @@ Route::post('UserLogin',[UserController::class,'login']);
 Route::post('DeviceRegister',[DeviceController::class,'registerDevice']);
 Route::post('AppRegister',[MobileAppController::class,'appRegister']);
 Route::post('subscribe',[PurchaseController::class,'purchase']);
+Route::post('subscription_check',[PurchaseController::class,'subscription_Check']);

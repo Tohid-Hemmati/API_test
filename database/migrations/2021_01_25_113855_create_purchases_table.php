@@ -17,7 +17,7 @@ class CreatePurchasesTable extends Migration
             $table->id();
             $table->integer('app_id');
             $table->string('receipt');
-            $table->timestamps();
+            $table->dateTime('subscription_start');
             $table->dateTime('expire');
         });
     }
