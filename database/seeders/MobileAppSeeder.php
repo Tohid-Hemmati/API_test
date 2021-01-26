@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\MobileApp;
 use Illuminate\Database\Seeder;
 
 class MobileAppSeeder extends Seeder
@@ -13,6 +14,6 @@ class MobileAppSeeder extends Seeder
      */
     public function run()
     {
-        //
+        MobileApp::factory()->count(10000)->create();
     }
 }

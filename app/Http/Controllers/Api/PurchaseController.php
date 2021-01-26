@@ -24,41 +24,44 @@ class PurchaseController extends Controller
 
         $client = MobileApp::where('app_token', $token)->first();
         if ($client) {
-            if (strtolower($client->device_OS) == 'android') {
-                if ($this->Google_mocker($request['receipt']) === true) {
-                    $request['app_id'] = $client->id;
-                    $request['subscription_start'] = date('Y-m-d');
-                    $request['expire'] = date('Y-m-d', strtotime('+1 year'));
-                    $purchase = Purchase::create($request->toArray());
+            if ($client->subscription_status !== 1) {
+                if (strtolower($client->device_OS) == 'android') {
+                    if ($this->Google_mocker($request['receipt']) === true) {
+                        $request['app_id'] = $client->id;
+                        $request['subscription_start'] = date('Y-m-d');
+                        $request['expire'] = date('Y-m-d', strtotime('+1 year'));
+                        $purchase = Purchase::create($request->toArray());
 
-                    $client->subscription_status = 1 ;
-                    $client->save();
-                    return response($purchase, 200);
-                }else
-                {
-                    $response = ["message" => 'Not verified by google'];
-            return response($response, 422);
+                        $client->subscription_status = 1;
+                        $client->save();
+                        return response($purchase, 200);
+                    } else {
+                        $response = ["message" => 'Not verified by google'];
+                        return response($response, 422);
+                    }
+
+                } elseif (strtolower($client->device_OS) == 'ios') {
+                    if ($this->ios_mocker($request['receipt']) === true) {
+                        $request['app_id'] = $client->id;
+                        $request['subscription_start'] = date('Y-m-d H:i:s');
+                        $request['expire'] = date('Y-m-d H:i:s', strtotime('+1 year'));
+                        $purchase = Purchase::create($request->toArray());
+                        $client->subscription_status = 1;
+                        $client->save();
+                        return response($purchase, 200);
+                    } else {
+                        $response = ["message" => 'Not verified by Apple'];
+                        return response($response, 422);
+                    }
+
+                } else {
+                    $response = ["message" => 'OS not supported'];
+                    return response($response, 422);
+
                 }
-
-            } elseif (strtolower($client->device_OS) == 'ios') {
-                if ($this->ios_mocker($request['receipt']) === true) {
-                    $request['app_id'] = $client->id;
-                    $request['subscription_start'] = date('Y-m-d H:i:s');
-                    $request['expire'] = date('Y-m-d H:i:s', strtotime('+1 year'));
-                    $purchase = Purchase::create($request->toArray());
-                    $client->subscription_status = 1 ;
-                    $client->save();
-                    return response($purchase, 200);
-                }else
-                {
-                    $response = ["message" => 'Not verified by Apple'];
-            return response($response, 422);
-                }
-
             } else {
-                $response = ["message" => 'OS not supported'];
-                return response($response, 422);
-
+                $response = ["message" => 'you are already subscribed'];
+                return response($response, 405);
             }
         } else {
             $response = ["message" => 'please register application'];
@@ -70,28 +73,23 @@ class PurchaseController extends Controller
     public function subscription_Check(Request $request)
     {
         $token = $request->bearerToken();
-        if ($token){
-        $client = MobileApp::where('app_token', $token)->first();
-            if ($client)
-            {
-                if ($client->subscription_status ===1)
-                {
-                 return 'You Are Subscribed';
-                }else
-                    {
-                        return 'You are Not Subscribed';
-                    }
-            }else
-            {
+        if ($token) {
+            $client = MobileApp::where('app_token', $token)->first();
+            if ($client) {
+                if ($client->subscription_status === 1) {
+                    return 'You Are Subscribed';
+                } else {
+                    return 'You are Not Subscribed';
+                }
+            } else {
                 $response = ["message" => 'UNAUTHORIZED'];
                 return response($response, 401);
 
             }
 
-        }else
-            {
-                return 'please insert token';
-            }
+        } else {
+            return 'please insert token';
+        }
 
     }
 

@@ -20,6 +20,7 @@ class CreateDevicesTable extends Migration
             $table->string('lang');
             $table->string('OS');
             $table->string('client_token');
+            $table->index('client_token');
             $table->timestamps();
         });
     }
