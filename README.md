@@ -113,7 +113,7 @@ Required:
 
 <br>method: post
 <br>Accept: application/json
-<br>bearerToken: app_token(get from related app's table)
+<br>bearerToken: client_token(get from related app's table)
 
 ## subscribing revoke
 
@@ -121,4 +121,4 @@ Required:
 
 <br>method: post
 <br>Accept: application/json
-<br>bearerToken: app_token(get from related app's table)
+<br>bearerToken: client_token(get from related app's table)
