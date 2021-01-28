@@ -17,16 +17,17 @@ class MobileAppController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'in_app_purchase' => 'required|boolean',
-            'name' => 'required',
+            'app_name' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);
         }
+
         $token = $request->bearerToken();
-        $device = Device::where('client_token', $token)->first();
+        $device = Device::where('device_token', $token)->first();
         if ($device) {
-            $request['app_token'] = Hash::make(Str::random(10));
+            $request['client_token'] = Hash::make(Str::random(10));
             $request['device_id'] = $device->id;
             $request['device_OS'] = $device->OS;
             $request['register_time'] = date('Y-m-d H:i:s');

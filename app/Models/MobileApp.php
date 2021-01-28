@@ -12,9 +12,6 @@ class MobileApp extends Model
     protected $guarded = ['id'];
 
     protected $hidden = [
-        'password',
-        'remember_token',
-        'userToken',
         'id'
     ];
     public $timestamps = false;

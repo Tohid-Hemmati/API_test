@@ -16,7 +16,6 @@ class DeviceController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'appID' => 'required',
             'lang' => 'required|string',
             'OS' => 'required|string',
         ]);
@@ -24,10 +23,11 @@ class DeviceController extends Controller
         if ($validator->fails()) {
             return response(['errors' => $validator->errors()->all()], 422);
         }
+
         $token = $request->bearerToken();
         $user = User::where('userToken', $token)->first();
         if ($user) {
-            $request['client_token'] = Hash::make(Str::random(10));
+            $request['device_token'] = Hash::make(Str::random(10));
             $request['uID'] = $user->id;
             $device = Device::create($request->toArray());
             return response($device, 200);

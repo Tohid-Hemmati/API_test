@@ -22,74 +22,96 @@ class PurchaseController extends Controller
 
         $token = $request->bearerToken();
 
-        $client = MobileApp::where('app_token', $token)->first();
-        if ($client) {
-            if ($client->subscription_status !== 1) {
-                if (strtolower($client->device_OS) == 'android') {
-                    if ($this->Google_mocker($request['receipt']) === true) {
-                        $request['app_id'] = $client->id;
-                        $request['subscription_start'] = date('Y-m-d');
-                        $request['expire'] = date('Y-m-d', strtotime('+1 year'));
-                        $purchase = Purchase::create($request->toArray());
-
-                        $client->subscription_status = 1;
-                        $client->save();
-                        return response($purchase, 200);
-                    } else {
-                        $response = ["message" => 'Not verified by google'];
-                        return response($response, 422);
-                    }
-
-                } elseif (strtolower($client->device_OS) == 'ios') {
-                    if ($this->ios_mocker($request['receipt']) === true) {
-                        $request['app_id'] = $client->id;
-                        $request['subscription_start'] = date('Y-m-d H:i:s');
-                        $request['expire'] = date('Y-m-d H:i:s', strtotime('+1 year'));
-                        $purchase = Purchase::create($request->toArray());
-                        $client->subscription_status = 1;
-                        $client->save();
-                        return response($purchase, 200);
-                    } else {
-                        $response = ["message" => 'Not verified by Apple'];
-                        return response($response, 422);
-                    }
-
-                } else {
-                    $response = ["message" => 'OS not supported'];
-                    return response($response, 422);
-
-                }
-            } else {
-                $response = ["message" => 'you are already subscribed'];
-                return response($response, 405);
-            }
-        } else {
+        $client = MobileApp::where('client_token', $token)->first();
+        if (!$client) {
             $response = ["message" => 'please register application'];
             return response($response, 422);
+        }
 
+        if ($client->subscription_expire > date('Y-m-d H:i:s')) {
+            $response = ["message" => 'you are already subscribed'];
+            return response($response, 405);
+        }
+        switch (strtolower($client->device_OS)) {
+
+            case 'android':
+                if ($this->Google_mocker($request['receipt']) !== true) {
+                    $response = ["message" => 'Not verified by google'];
+                    return response($response, 422);
+                }
+
+                $request['app_id'] = $client->id;
+                $request['purchase_time'] = date('Y-m-d H:i:s');
+                $purchase = Purchase::create($request->toArray());
+                $client->subscription_start = date('Y-m-d H:i:s');
+                $client->subscription_expire = date('Y-m-d H:i:s', strtotime('+1 year'));
+                $client->subscription_renewal +=1;
+                $client->save();
+                return response($purchase, 200);
+
+            case 'ios':
+
+                if ($this->ios_mocker($request['receipt']) !== true) {
+                    $response = ["message" => 'Not verified by Apple'];
+                    return response($response, 422);
+                }
+
+                $request['app_id'] = $client->id;
+                $request['purchase_time'] = date('Y-m-d H:i:s');
+                $purchase = Purchase::create($request->toArray());
+                $client->subscription_start = date('Y-m-d H:i:s');
+                $client->subscription_expire = date('Y-m-d H:i:s', strtotime('+1 year'));
+                $client->subscription_renewal +=1;
+                $client->save();
+                return response($purchase, 200);
+
+
+            default:
+                $response = ["message" => 'OS not supported'];
+                return response($response, 422);
         }
     }
+
 
     public function subscription_Check(Request $request)
     {
         $token = $request->bearerToken();
-        if ($token) {
-            $client = MobileApp::where('app_token', $token)->first();
-            if ($client) {
-                if ($client->subscription_status === 1) {
-                    return 'You Are Subscribed';
-                } else {
-                    return 'You are Not Subscribed';
-                }
-            } else {
-                $response = ["message" => 'UNAUTHORIZED'];
-                return response($response, 401);
-
-            }
-
-        } else {
-            return 'please insert token';
+        if (!$token) {
+            $response = ["message" => 'please insert token'];
+            return response($response, 406);
         }
+
+        $client = MobileApp::where('client_token', $token)->first();
+        if (!$client) {
+            $response = ["message" => 'UNAUTHORIZED'];
+            return response($response, 401);
+        }
+
+        if ($client->subscription_expire > date('Y-m-d H:i:s')) {
+            return 'You Are Subscribed';
+        } else {
+            return 'You are Not Subscribed';
+        }
+
+    }
+
+    public function cancel_subscription(Request $request)
+    {
+        $token = $request->bearerToken();
+        if (!$token) {
+            $response = ["message" => 'please insert token'];
+            return response($response, 406);
+        }
+
+        $client = MobileApp::where('client_token', $token)->first();
+        if (!$client){
+            $response = ["message" => 'UNAUTHORIZED'];
+            return response($response, 401);
+        }
+        $client->subscription_expire=date('Y-m-d H:i:s');
+        $client->save();
+        $response = ["message" => 'subscription canceled'];
+        return response($response, 200);
 
     }
 
@@ -115,8 +137,6 @@ class PurchaseController extends Controller
         foreach ($receipt as $val) {
             if (is_numeric($val)) {
                 if ($val % 2 !== 0) {
-
-
                     return true;
                 } else {
                     return false;

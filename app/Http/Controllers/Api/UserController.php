@@ -26,7 +26,6 @@ class UserController extends Controller
 
         $request['password'] = Hash::make($request['password']);
         $request['userToken'] = Hash::make(Str::random(10));
-        $request['userToken'] = 'kjnk';
         $user = User::create($request->toArray());
         return response($user, 200);
     }
@@ -35,7 +34,7 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|max:100',
-            'password' => 'required|min:6|confirmed'
+            'password' => 'required|min:6'
         ]);
 
         if ($validator->fails()) {

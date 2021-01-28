@@ -10,6 +10,7 @@
 -   **http://127.0.0.1:8000/api/DeviceRegister**
 -   **http://127.0.0.1:8000/api/AppRegister**
 -   **http://127.0.0.1:8000/api/subscription_check**
+    **http://127.0.0.1:8000/api/cancel_subscription**
     <br><br>
 
 ## database schemas
@@ -74,7 +75,6 @@ Required:
 <br>bearerToken: userToken(get from related user's table)
 
 <b>Required:</b>
-<br>appID
 <br>lang
 <br>OS
 
@@ -86,11 +86,11 @@ Required:
 
 <br>method: post
 <br>Accept: application/json
-<br>bearerToken: client_token(get from related device's table)
+<br>bearerToken: device_token(get from related device's table)
 
 <b>Required:</b>
-<br>name
-<br>in_app_purchase
+<br>app_name
+<br>in_app_purchase (set to 1)
 
 <hr>
 
@@ -100,7 +100,7 @@ Required:
 
 <br>method: post
 <br>Accept: application/json
-<br>bearerToken: app_token(get from related app's table)
+<br>bearerToken: client_token(get from related app's table)
 
 <b>Required:</b>
 <br>receipt
@@ -110,6 +110,14 @@ Required:
 ## subscribing check
 
 /subscription_check
+
+<br>method: post
+<br>Accept: application/json
+<br>bearerToken: app_token(get from related app's table)
+
+## subscribing revoke
+
+/cancel_subscription
 
 <br>method: post
 <br>Accept: application/json

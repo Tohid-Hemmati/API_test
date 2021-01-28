@@ -16,11 +16,9 @@ class CreateDevicesTable extends Migration
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
             $table->integer('uID');
-            $table->integer('appID');
             $table->string('lang');
             $table->string('OS');
-            $table->string('client_token');
-            $table->index('client_token');
+            $table->string('device_token');
             $table->timestamps();
         });
     }
