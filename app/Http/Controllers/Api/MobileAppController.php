@@ -12,7 +12,9 @@ use Illuminate\Support\Str;
 
 class MobileAppController extends Controller
 {
-
+    public function test(){
+        return 2 ;
+    }
     public function appRegister(Request $request)
     {
         $validator = Validator::make($request->all(), [

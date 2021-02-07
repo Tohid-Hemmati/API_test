@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\MobileAppController;
+use App\Http\Controllers\Api\PurchaseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +18,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('hasan',[MobileAppController::class,'test']);

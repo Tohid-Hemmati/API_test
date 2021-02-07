@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+//use App\Events\SubscriptionStart;
 use App\Models\MobileApp;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class PurchaseController extends Controller
 {
     public function purchase(Request $request, Purchase $purchase)
-    {
+    {   dd($request);
         $validator = Validator::make($request->all(), [
             'receipt' => 'required',
         ]);
@@ -28,10 +29,12 @@ class PurchaseController extends Controller
             return response($response, 422);
         }
 
-        if ($client->subscription_expire > date('Y-m-d H:i:s')) {
-            $response = ["message" => 'you are already subscribed'];
-            return response($response, 405);
-        }
+//        if ($client->subscription_expire > date('Y-m-d H:i:s')) {
+//            $response = ["message" => 'you are already subscribed'];
+//            return response($response, 405);
+//        }
+
+
         switch (strtolower($client->device_OS)) {
 
             case 'android':
@@ -47,6 +50,7 @@ class PurchaseController extends Controller
                 $client->subscription_expire = date('Y-m-d H:i:s', strtotime('+1 year'));
                 $client->subscription_renewal +=1;
                 $client->save();
+                SubscriptionStart::dispatch($client);
                 return response($purchase, 200);
 
             case 'ios':
@@ -62,7 +66,8 @@ class PurchaseController extends Controller
                 $client->subscription_start = date('Y-m-d H:i:s');
                 $client->subscription_expire = date('Y-m-d H:i:s', strtotime('+1 year'));
                 $client->subscription_renewal +=1;
-                $client->save();
+//                $client->save();
+                SubscriptionStart::dispatch($client);
                 return response($purchase, 200);
 
 

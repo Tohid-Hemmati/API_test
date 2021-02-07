@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CallBackController;
 use App\Http\Controllers\Api\DeviceController;
 use App\Http\Controllers\Api\MobileAppController;
 use App\Http\Controllers\Api\PurchaseController;
@@ -28,3 +29,4 @@ Route::post('AppRegister',[MobileAppController::class,'appRegister']);
 Route::post('subscribe',[PurchaseController::class,'purchase']);
 Route::post('subscription_check',[PurchaseController::class,'subscription_Check']);
 Route::post('cancel_subscription',[PurchaseController::class,'cancel_subscription']);
+Route::post('callBack',[CallBackController::class,'callBack']);
